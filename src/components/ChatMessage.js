@@ -1,12 +1,27 @@
 import React from "react";
 import styled from "styled-components";
 
-function ChatMessage({ text, name, image, timestamp }) {
+function ChatMessage({
+	id,
+	text,
+	name,
+	image,
+	timestamp,
+	thread,
+	threadStart,
+}) {
 	return (
 		<Container>
 			<UserAvatar>
 				{/* eslint-disable-next-line*/}
-				<img src={image} alt='Profile Photo' />
+				<img
+					src={
+						image
+							? image
+							: "https://randomuser.me/api/portraits/lego/1.jpg"
+					}
+					alt='Profile Photo'
+				/>
 			</UserAvatar>
 			<MessageContent>
 				<Name>
@@ -14,6 +29,11 @@ function ChatMessage({ text, name, image, timestamp }) {
 					<span>{new Date(timestamp.toDate()).toUTCString()}</span>
 				</Name>
 				<Text>{text}</Text>
+				{!thread && (
+					<div className='thread' onClick={() => threadStart(id)}>
+						Thread start
+					</div>
+				)}
 			</MessageContent>
 		</Container>
 	);
@@ -24,10 +44,19 @@ export default ChatMessage;
 const Container = styled.div`
 	padding: 8px 20px;
 	display: flex;
-	align-items: center;
+	align-items: flex-start;
+
+	:hover {
+		background: #efefef;
+
+		.thread {
+			opacity: 1;
+		}
+	}
 `;
 
 const UserAvatar = styled.div`
+	padding-top: 5px;
 	width: 36px;
 	height: 36px;
 	border-radius: 2px;
@@ -41,6 +70,14 @@ const UserAvatar = styled.div`
 const MessageContent = styled.div`
 	display: flex;
 	flex-direction: column;
+
+	.thread {
+		font-size: 12px;
+		opacity: 0;
+		color: #7b7b7b;
+		transition: all 0.1s ease-out;
+		cursor: pointer;
+	}
 `;
 const Name = styled.span`
 	font-weight: bold;

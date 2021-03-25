@@ -1,9 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import SendIcon from "@material-ui/icons/Send";
+import InsertEmoticonOutlinedIcon from "@material-ui/icons/InsertEmoticonOutlined";
+import "emoji-mart/css/emoji-mart.css";
+import { Picker } from "emoji-mart";
 
-function ChatInput({ sendMessage }) {
+function ChatInput({ sendMessage, className }) {
 	const [input, setInput] = useState("");
+	const [emoji, setEmoji] = useState([]);
+	const [showEmoji, setShowEmoji] = useState(false);
+
 	const send = (e) => {
 		e.preventDefault();
 		if (!input) return;
@@ -11,8 +17,16 @@ function ChatInput({ sendMessage }) {
 		sendMessage(input);
 		setInput("");
 	};
+	useEffect(() => {
+		if (!emoji || emoji.length === 0) return;
+		let sym = emoji.unified.split("-");
+		let codesArray = [];
+		sym.forEach((el) => codesArray.push("0x" + el));
+		let emojiName = String.fromCodePoint(...codesArray);
+		setInput(input + emojiName);
+	}, [emoji]);
 	return (
-		<Container>
+		<Container className={className}>
 			<InputContainer>
 				<form>
 					<input
@@ -23,6 +37,25 @@ function ChatInput({ sendMessage }) {
 							setInput(e.target.value);
 						}}
 					/>
+					<div
+						className='emodji-button'
+						onClick={() => {
+							setShowEmoji(!showEmoji);
+						}}>
+						{showEmoji ? (
+							<Picker
+								onSelect={setEmoji}
+								style={{
+									position: "absolute",
+									bottom: "-12px",
+									right: "-35px",
+									transform: "scale(0.75)",
+								}}
+							/>
+						) : (
+							<InsertEmoticonOutlinedIcon></InsertEmoticonOutlinedIcon>
+						)}
+					</div>
 					<SendButton type='submit' onClick={send}>
 						<Send />
 					</SendButton>
@@ -35,7 +68,18 @@ function ChatInput({ sendMessage }) {
 export default ChatInput;
 
 const Container = styled.div`
+	position: relative;
 	padding: 0 20px 24px;
+
+	.emodji-button {
+		display: flex;
+		align-items: center;
+		margin-right: 5px;
+		cursor: pointer;
+		.MuiSvgIcon-root {
+			color: #8d8d8e;
+		}
+	}
 `;
 
 const InputContainer = styled.div`
