@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import "./App.css";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Chat from "./components/Chat";
@@ -5,21 +6,58 @@ import Login from "./components/Login";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import styled from "styled-components";
+import db from "./firebase";
+import { auth } from "./firebase";
 
 function App() {
+	const [rooms, setRooms] = useState([]);
+	const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+
+	useEffect(() => {
+		getChannels();
+	}, []);
+
+	const getChannels = () => {
+		db.collection("rooms").onSnapshot((snapshot) => {
+			setRooms(
+				snapshot.docs.map((doc) => {
+					return { id: doc.id, name: doc.data().name };
+				})
+			);
+		});
+	};
+
+	const signOut = () => {
+		auth.signOut().then(() => {
+			setUser(null);
+			localStorage.removeItem("user");
+		});
+	};
+
 	return (
 		<div className='app'>
 			<Router>
-				<Container>
-					<Header />
-					<Main>
-						<Sidebar />
-						<Switch>
-							<Route path='/room' component={Chat} />
-							<Route path='/' component={Login} />
-						</Switch>
-					</Main>
-				</Container>
+				{!user ? (
+					<Login setUser={setUser} />
+				) : (
+					<Container>
+						<Header user={user} signOut={signOut} />
+						<Main>
+							<Sidebar rooms={rooms} />
+							<Switch>
+								<Route path='/room/:channelId'>
+									<Chat user={user} />
+								</Route>
+								<Route path='/'>
+									<ChannelEmpty>
+										Select or Create new Channel
+									</ChannelEmpty>
+								</Route>
+								{/* <Route path='/' component={Login} /> */}
+							</Switch>
+						</Main>
+					</Container>
+				)}
 			</Router>
 		</div>
 	);
@@ -31,9 +69,14 @@ const Container = styled.div`
 	width: 100%;
 	height: 100vh;
 	display: grid;
-	grid-template-rows: 38px auto;
+	grid-template-rows: 38px minmax(0, 1fr);
 `;
 const Main = styled.div`
 	display: grid;
 	grid-template-columns: 260px auto;
+`;
+
+const ChannelEmpty = styled.div`
+	padding: 20px;
+	font-size: 20px;
 `;

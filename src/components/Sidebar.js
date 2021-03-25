@@ -1,10 +1,28 @@
-import React from "react";
 import styled from "styled-components";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 import AddIcon from "@material-ui/icons/Add";
 import { sidebarItemsData } from "../data/SidebarData";
+import db from "../firebase";
+import { useHistory } from "react-router-dom";
 
-function Sidebar() {
+function Sidebar({ rooms }) {
+	const addChannel = () => {
+		const promptName = prompt("Enter a channel name");
+		if (promptName) {
+			db.collection("rooms").add({
+				name: promptName,
+			});
+		}
+	};
+
+	const history = useHistory();
+
+	const goToChannel = (id) => {
+		if (id) {
+			history.push(`/room/${id}`);
+		}
+	};
+
 	return (
 		<Container>
 			<WorkSpaceContainer>
@@ -15,7 +33,7 @@ function Sidebar() {
 			</WorkSpaceContainer>
 			<MainChannels>
 				{sidebarItemsData.map((item) => (
-					<MainChannelItem>
+					<MainChannelItem key={item.name}>
 						{item.icon}
 						{item.name}
 					</MainChannelItem>
@@ -24,11 +42,16 @@ function Sidebar() {
 			<ChannelsContainer>
 				<NewChannelContainer>
 					<div>Channel</div>
-					<AddIcon />
+					<AddIcon onClick={addChannel} />
 				</NewChannelContainer>
 				<ChannelsList>
-					<Channel># Channel 1</Channel>
-					<Channel># Channel 2</Channel>
+					{rooms.map((room) => (
+						<Channel
+							onClick={() => goToChannel(room.id)}
+							key={room.id}>
+							# {room.name}
+						</Channel>
+					))}
 				</ChannelsList>
 			</ChannelsContainer>
 		</Container>
@@ -94,6 +117,11 @@ const NewChannelContainer = styled.div`
 	height: 28px;
 	padding-left: 19px;
 	padding-right: 12px;
+	padding-bottom: 8px;
+
+	.MuiSvgIcon-root {
+		cursor: pointer;
+	}
 `;
 const ChannelsList = styled.div``;
 const Channel = styled.div`
