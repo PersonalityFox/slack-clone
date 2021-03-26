@@ -13,14 +13,13 @@ function ChatMessage({
 	return (
 		<Container>
 			<UserAvatar>
-				{/* eslint-disable-next-line*/}
 				<img
+					alt='Profile Photo'
 					src={
 						image
 							? image
 							: "https://randomuser.me/api/portraits/lego/1.jpg"
 					}
-					alt='Profile Photo'
 				/>
 			</UserAvatar>
 			<MessageContent>

@@ -58,7 +58,6 @@ function Chat({ user }) {
 
 		containerElement.classList.remove("open");
 
-		// Remove from history and url
 		history.push(`/room/${channelId}`);
 	};
 	const threadStart = (id) => {

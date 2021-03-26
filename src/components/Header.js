@@ -18,7 +18,6 @@ function Header({ user, signOut }) {
 			<UserContainer>
 				<Name>{user.name}</Name>
 				<UserImage onClick={signOut}>
-					{/* eslint-disable-next-line*/}
 					<img
 						alt='Profile Photo'
 						src={
